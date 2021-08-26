@@ -823,7 +823,7 @@ native void TF2_RemovePlayerDisguise(int client);
 native void TF2_StunPlayer(int client, float duration, float slowdown = 0.0, int stunflags, int attacker = 0);
 
 forward void TF2_OnConditionRemoved(int client, TFCond cond);
-forward void TF2_OnConditionAdded(int client, TFCond cond, float dur/*, int inflictor*/);
+forward void TF2_OnConditionAdded(int client, TFCond cond, float dur, int inflictor);
 forward Action TF2_CalcIsAttackCritical(int client, int weapon, char[] weaponname, bool &result);
 forward Action TF2_OnPlayerTeleport(int client, int teleporter, bool &result);
 forward void TF2_OnWaitingForPlayersStart();

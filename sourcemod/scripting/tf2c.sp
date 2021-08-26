@@ -86,6 +86,7 @@ enum struct CondShit
 {
 	TFCond cond;
 	float time;
+	int provider;
 }
 
 #define CHECK(%1,%2) if (!(%1)) LogError("Could not load native for \"" ... %2 ... "\"")
@@ -154,7 +155,7 @@ public void OnPluginStart()
 	{
 		DHookAddParam(hook, HookParamType_Int);
 		DHookAddParam(hook, HookParamType_Float);
-		DHookAddParam(hook, HookParamType_Int);	// Pass as Int so null providers aren't "world"
+		DHookAddParam(hook, HookParamType_CBaseEntity);
 		// The way the ext does it is pretty stupid, so let's just cheese it
 		// This is probably better since devs can hook and remove conds before any logic gets churned
 		DHookEnableDetour(hook, false, CTFPlayerShared_AddCond);
@@ -295,6 +296,8 @@ public MRESReturn CTFPlayerShared_AddCond(Address pThis, Handle hParams)
 	CondShit shit;
 	shit.cond = DHookGetParam(hParams, 1);
 	shit.time = DHookGetParam(hParams, 2);
+	shit.provider = DHookIsNullParam(hParams, 3) ? 0 : DHookGetParam(hParams, 3);
+	
 
 	g_Bullshit1.PushArray(shit, sizeof(shit));
 
@@ -328,7 +331,7 @@ public MRESReturn CTFPlayerShared_AddCondPost(Address pThis, Handle hParams)
 			Call_PushCell(client);
 			Call_PushCell(shit.cond);
 			Call_PushFloat(shit.time);
-//			Call_PushCell(provider);
+			Call_PushCell(shit.provider);
 			Call_Finish();
 		}
 	}
@@ -462,7 +465,7 @@ public APLRes AskPluginLoad2(Handle self, bool late, char[] error, int max)
 	CreateNative("TF2_RemovePlayerDisguise", Native_TF2_RemovePlayerDisguise);
 	CreateNative("TF2_StunPlayer", Native_TF2_StunPlayer);
 
-	hOnConditionAdded = new GlobalForward("TF2_OnConditionAdded", ET_Ignore, Param_Cell, Param_Cell, Param_Float);
+	hOnConditionAdded = new GlobalForward("TF2_OnConditionAdded", ET_Ignore, Param_Cell, Param_Cell, Param_Float, Param_Cell);
 	hOnConditionRemoved = new GlobalForward("TF2_OnConditionRemoved", ET_Ignore, Param_Cell, Param_Cell);
 	hCalcIsAttackCritical = new GlobalForward("TF2_CalcIsAttackCritical", ET_Event, Param_Cell, Param_Cell, Param_String, Param_CellByRef);
 	hCanPlayerTeleport = new GlobalForward("TF2_OnPlayerTeleport", ET_Event, Param_Cell, Param_Cell, Param_CellByRef);
